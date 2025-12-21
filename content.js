@@ -136,6 +136,7 @@
   }
 
   function toggleActive(state) {
+    if (active === state) return;
     active = state;
     if (active) {
       createOverlay();
@@ -161,6 +162,13 @@
       sendResponse({ status: "ok" });
     } else if (request.action === "getStatus") {
       sendResponse({ active: active });
+    }
+  });
+
+  // Listen for storage changes to sync state across all tabs
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && changes.enabled) {
+      toggleActive(changes.enabled.newValue);
     }
   });
 

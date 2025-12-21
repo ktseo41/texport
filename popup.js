@@ -12,14 +12,18 @@ document.addEventListener("DOMContentLoaded", () => {
       chrome.storage.local.set({ enabled: newState }, () => {
         updateUI(newState);
 
-        // Notify content script in the active tab
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          if (tabs[0]) {
-            chrome.tabs.sendMessage(tabs[0].id, {
-              action: "toggle",
-              enabled: newState,
-            });
-          }
+        // Notify content script in all tabs
+        chrome.tabs.query({}, (tabs) => {
+          tabs.forEach((tab) => {
+            chrome.tabs
+              .sendMessage(tab.id, {
+                action: "toggle",
+                enabled: newState,
+              })
+              .catch((err) => {
+                // Ignore errors for tabs where content script might not be loaded or accessible
+              });
+          });
         });
       });
     });
