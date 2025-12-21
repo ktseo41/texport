@@ -27,10 +27,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateUI(isEnabled) {
     if (isEnabled) {
-      toggleBtn.textContent = "비활성화하기";
+      toggleBtn.textContent = "Deactivate";
       toggleBtn.classList.add("active");
     } else {
-      toggleBtn.textContent = "활성화하기";
+      toggleBtn.textContent = "Activate";
       toggleBtn.classList.remove("active");
     }
   }
