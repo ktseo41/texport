@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Extract Webpage Text",
+  "version": "1.0",
+  "description": "Extract text from selected webpage elements and save as .txt",
+  "permissions": [
+    "downloads",
+    "storage",
+    "activeTab"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ]
+}
