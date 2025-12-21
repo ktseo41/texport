@@ -6,6 +6,9 @@
   let overlay = null;
   let label = null;
 
+  let lastMouseX = 0;
+  let lastMouseY = 0;
+
   function createOverlay() {
     if (overlay) return;
     overlay = document.createElement("div");
@@ -56,6 +59,9 @@
   }
 
   function handleMouseMove(e) {
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+
     if (!active) return;
 
     const el = document.elementFromPoint(e.clientX, e.clientY);
@@ -69,26 +75,39 @@
   }
 
   function handleKeyDown(e) {
-    if (!active || !currentFocusElement) return;
+    if (!active) return;
+
+    // Ensure we have a focus element if keys are pressed
+    if (!currentFocusElement) {
+      const el = document.elementFromPoint(lastMouseX, lastMouseY);
+      if (el && el !== overlay && !overlay.contains(el)) {
+        hoveredElement = el;
+        currentFocusElement = el;
+        updateOverlay(currentFocusElement);
+      }
+    }
+
+    if (!currentFocusElement) return;
 
     if (e.key === "ArrowUp") {
       e.preventDefault();
+      e.stopPropagation();
       if (
         currentFocusElement.parentElement &&
-        currentFocusElement.parentElement !== document.body
+        currentFocusElement.parentElement !== document.documentElement
       ) {
         currentFocusElement = currentFocusElement.parentElement;
         updateOverlay(currentFocusElement);
       }
     } else if (e.key === "ArrowDown") {
       e.preventDefault();
+      e.stopPropagation();
       // Try to go back to the original hovered element if we are at a parent
-      // or find the first child that contains text
       if (
+        hoveredElement &&
         currentFocusElement.contains(hoveredElement) &&
         currentFocusElement !== hoveredElement
       ) {
-        // Heuristic: move one step back towards hoveredElement
         let child = hoveredElement;
         while (child.parentElement !== currentFocusElement) {
           child = child.parentElement;
@@ -130,9 +149,6 @@
         }
       }
     );
-
-    // Optionally deactivate after click? User didn't specify, but usually useful.
-    // toggleActive(false);
   }
 
   function toggleActive(state) {
@@ -140,14 +156,22 @@
     active = state;
     if (active) {
       createOverlay();
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("keydown", handleKeyDown);
+      document.addEventListener("mousemove", handleMouseMove, true);
+      document.addEventListener("keydown", handleKeyDown, true);
       document.addEventListener("click", handleClick, true);
       document.body.style.cursor = "crosshair";
+
+      // Initial check for element under mouse
+      const el = document.elementFromPoint(lastMouseX, lastMouseY);
+      if (el) {
+        hoveredElement = el;
+        currentFocusElement = el;
+        updateOverlay(currentFocusElement);
+      }
     } else {
       removeOverlay();
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("mousemove", handleMouseMove, true);
+      document.removeEventListener("keydown", handleKeyDown, true);
       document.removeEventListener("click", handleClick, true);
       document.body.style.cursor = "";
       hoveredElement = null;
