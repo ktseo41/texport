@@ -45,16 +45,18 @@
     overlay.style.width = `${rect.width}px`;
     overlay.style.height = `${rect.height}px`;
 
-    const text = el.innerText || "";
-    label.textContent = `Chars: ${text.trim().length}`;
+    const text = (el.innerText || "").trim();
+    const tagName = el.tagName.toLowerCase();
+
+    label.innerHTML = `<span class="ext-text-extractor-tag">${tagName}</span><span>Chars: ${text.length}</span>`;
 
     // Adjust label position if too close to top
-    if (rect.top < 30) {
+    if (rect.top < 40) {
       label.style.top = "100%";
-      label.style.borderRadius = "0 0 4px 4px";
+      label.style.marginTop = "4px";
     } else {
-      label.style.top = "-24px";
-      label.style.borderRadius = "4px 4px 0 0";
+      label.style.top = "-28px";
+      label.style.marginTop = "0";
     }
   }
 
@@ -98,6 +100,7 @@
       ) {
         currentFocusElement = currentFocusElement.parentElement;
         updateOverlay(currentFocusElement);
+        triggerPulse();
       }
     } else if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -114,10 +117,18 @@
         }
         currentFocusElement = child;
         updateOverlay(currentFocusElement);
+        triggerPulse();
       }
     } else if (e.key === "Escape") {
       toggleActive(false);
     }
+  }
+
+  function triggerPulse() {
+    if (!overlay) return;
+    overlay.classList.remove("pulse");
+    void overlay.offsetWidth; // Trigger reflow
+    overlay.classList.add("pulse");
   }
 
   function handleClick(e) {
