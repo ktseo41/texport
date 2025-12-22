@@ -155,6 +155,7 @@
     if (active === state) return;
     active = state;
     if (active) {
+      window.focus(); // Ensure focus for keyboard events
       createOverlay();
       document.addEventListener("mousemove", handleMouseMove, true);
       document.addEventListener("keydown", handleKeyDown, true);

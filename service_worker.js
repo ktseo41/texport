@@ -29,3 +29,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // Keep the message channel open for async response
   }
 });
+
+// Handle keyboard shortcuts
+chrome.commands.onCommand.addListener((command) => {
+  if (command === "toggle-activation") {
+    chrome.storage.local.get(["enabled"], (result) => {
+      const newState = !result.enabled;
+      chrome.storage.local.set({ enabled: newState });
+    });
+  }
+});
