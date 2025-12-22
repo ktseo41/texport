@@ -48,12 +48,54 @@
         color: #888;
         line-height: 1.4;
       }
+      .action-selector {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .action-selector label {
+        font-size: 12px;
+        color: #555;
+        font-weight: 600;
+      }
+      .btn-group {
+        display: flex;
+        background: #e9ecef;
+        padding: 2px;
+        border-radius: 6px;
+      }
+      .action-btn {
+        flex: 1;
+        padding: 6px;
+        border: none;
+        background: transparent;
+        font-size: 12px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.2s;
+        color: #666;
+      }
+      .action-btn.active {
+        background: white;
+        color: #007bff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
     <div class="container">
       <h2>Text Extractor</h2>
       <button id="toggleBtn" class="toggle-btn">Activate</button>
+      
+      <div class="action-selector">
+        <label>Result Action:</label>
+        <div class="btn-group">
+          <button id="downloadAction" class="action-btn active" data-action="download">Download</button>
+          <button id="copyAction" class="action-btn" data-action="copy">Copy</button>
+        </div>
+      </div>
+
       <div class="info">
         • Hover: Blue highlighting<br />
         • ArrowUp/Down: Navigate hierarchy<br />

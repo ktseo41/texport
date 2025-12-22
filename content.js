@@ -126,29 +126,55 @@
     e.preventDefault();
     e.stopPropagation();
 
-    const text = currentFocusElement.innerText || "";
-    const filename =
-      (document.title || "extracted_text")
-        .replace(/[^a-z0-9]/gi, "_")
-        .toLowerCase() + ".txt";
+    const text = (currentFocusElement.innerText || "").trim();
 
-    chrome.runtime.sendMessage(
-      {
-        action: "download_text",
-        text: text.trim(),
-        filename: filename,
-      },
-      (response) => {
-        if (response && response.success) {
-          console.log("Text saved successfully");
-        } else {
-          console.error(
-            "Failed to save text",
-            response ? response.error : "No response"
-          );
-        }
+    chrome.storage.local.get(["clickAction"], (result) => {
+      const action = result.clickAction || "download";
+
+      if (action === "copy") {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            // Visual feedback
+            const originalLabel = label.textContent;
+            label.textContent = "Copied!";
+            label.style.backgroundColor = "#28a745"; // Success green
+
+            setTimeout(() => {
+              if (label) {
+                label.textContent = originalLabel;
+                label.style.backgroundColor = "";
+              }
+            }, 1000);
+          })
+          .catch((err) => {
+            console.error("Failed to copy text: ", err);
+          });
+      } else {
+        const filename =
+          (document.title || "extracted_text")
+            .replace(/[^a-z0-9]/gi, "_")
+            .toLowerCase() + ".txt";
+
+        chrome.runtime.sendMessage(
+          {
+            action: "download_text",
+            text: text,
+            filename: filename,
+          },
+          (response) => {
+            if (response && response.success) {
+              console.log("Text saved successfully");
+            } else {
+              console.error(
+                "Failed to save text",
+                response ? response.error : "No response"
+              );
+            }
+          }
+        );
       }
-    );
+    });
   }
 
   function toggleActive(state) {
