@@ -2,6 +2,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("toggleBtn");
   const downloadBtn = document.getElementById("downloadAction");
   const copyBtn = document.getElementById("copyAction");
+  const toggleKbd = document.getElementById("toggleKbd");
+
+  // Update shortcut display based on platform
+  const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+  if (isMac && toggleKbd) {
+    toggleKbd.textContent = "⌘⇧X";
+  } else if (toggleKbd) {
+    toggleKbd.textContent = "Ctrl+Shift+X";
+  }
 
   // Get current status from storage
   chrome.storage.local.get(["enabled", "clickAction"], (result) => {
