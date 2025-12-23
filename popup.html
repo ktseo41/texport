@@ -20,6 +20,16 @@
         font-size: 16px;
         color: #333;
       }
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .logo {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+      }
       .status {
         font-size: 14px;
         color: #666;
@@ -85,7 +95,10 @@
   </head>
   <body>
     <div class="container">
-      <h2>Text Extractor</h2>
+      <div class="header">
+        <img src="icons/icon48.png" alt="Logo" class="logo" />
+        <h2>Text Extractor</h2>
+      </div>
       <button id="toggleBtn" class="toggle-btn">Activate</button>
       
       <div class="action-selector">
