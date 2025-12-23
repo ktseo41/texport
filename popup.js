@@ -5,11 +5,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleKbd = document.getElementById("toggleKbd");
 
   // Update shortcut display based on platform
-  const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
-  if (isMac && toggleKbd) {
-    toggleKbd.textContent = "⌘⇧X";
-  } else if (toggleKbd) {
-    toggleKbd.textContent = "Ctrl+Shift+X";
+  const ua = navigator.userAgent.toUpperCase();
+  const isMac = ua.indexOf("MAC") >= 0;
+  const isWindows = ua.indexOf("WIN") >= 0;
+
+  if (toggleKbd) {
+    if (isMac) {
+      toggleKbd.textContent = "⌘⇧X";
+    } else if (isWindows) {
+      toggleKbd.textContent = "Ctrl+Shift+X";
+    } else {
+      toggleKbd.textContent = "Ctrl+Shift+X"; // Default
+    }
   }
 
   // Get current status from storage
