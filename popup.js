@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("toggleBtn");
   const downloadBtn = document.getElementById("downloadAction");
   const copyBtn = document.getElementById("copyAction");
+  const askBtn = document.getElementById("askAction");
   const toggleKbdContainer = document.getElementById("toggleKbdContainer");
 
   // Update shortcut display based on platform
@@ -45,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Action button listeners
-  [downloadBtn, copyBtn].forEach((btn) => {
+  [downloadBtn, copyBtn, askBtn].forEach((btn) => {
     btn.addEventListener("click", () => {
       const action = btn.getAttribute("data-action");
       chrome.storage.local.set({ clickAction: action }, () => {
@@ -65,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateActionUI(action) {
-    [downloadBtn, copyBtn].forEach((btn) => {
+    [downloadBtn, copyBtn, askBtn].forEach((btn) => {
       if (btn.getAttribute("data-action") === action) {
         btn.classList.add("active");
       } else {
@@ -73,4 +74,16 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // Listen for storage changes to sync UI
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local") {
+      if (changes.enabled) {
+        updateUI(changes.enabled.newValue);
+      }
+      if (changes.clickAction) {
+        updateActionUI(changes.clickAction.newValue);
+      }
+    }
+  });
 });

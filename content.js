@@ -5,6 +5,7 @@
   let currentFocusElement = null;
   let overlay = null;
   let label = null;
+  let actionMenu = null;
   let isCopiedState = false;
 
   let lastMouseX = 0;
@@ -88,6 +89,7 @@
     lastMouseY = e.clientY;
 
     if (!active) return;
+    if (actionMenu) return; // Don't highlight while menu is open
 
     const el = document.elementFromPoint(e.clientX, e.clientY);
     if (el && el !== overlay && !overlay.contains(el)) {
@@ -101,6 +103,17 @@
 
   function handleKeyDown(e) {
     if (!active) return;
+
+    if (e.key === "Escape") {
+      if (actionMenu) {
+        removeActionMenu();
+        return;
+      }
+      toggleActive(false);
+      return;
+    }
+
+    if (actionMenu) return; // Disable navigation while menu is open
 
     // Ensure we have a focus element if keys are pressed
     if (!currentFocusElement) {
@@ -142,8 +155,6 @@
         updateOverlay(currentFocusElement);
         triggerPulse();
       }
-    } else if (e.key === "Escape") {
-      toggleActive(false);
     }
   }
 
@@ -154,8 +165,124 @@
     overlay.classList.add("pulse");
   }
 
+  function performCopy(text, el) {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        // Visual feedback
+        isCopiedState = true;
+        label.innerHTML = "<span>Copied!</span>";
+        label.classList.add("copied");
+
+        setTimeout(() => {
+          isCopiedState = false;
+          if (label) {
+            label.classList.remove("copied");
+            updateOverlay(el);
+          }
+        }, 1000);
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  }
+
+  function performDownload(text) {
+    const filename =
+      (document.title || "extracted_text")
+        .replace(/[^a-z0-9]/gi, "_")
+        .toLowerCase() + ".txt";
+
+    chrome.runtime.sendMessage(
+      {
+        action: "download_text",
+        text: text,
+        filename: filename,
+      },
+      (response) => {
+        if (response && response.success) {
+          console.log("Text saved successfully");
+        } else {
+          console.error(
+            "Failed to save text",
+            response ? response.error : "No response"
+          );
+        }
+      }
+    );
+  }
+
+  function showActionMenu(x, y, text, el) {
+    removeActionMenu();
+
+    actionMenu = document.createElement("div");
+    actionMenu.className = "ext-text-extractor-menu";
+
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "copy-btn";
+    copyBtn.textContent = "Copy to Clipboard";
+    copyBtn.onclick = () => {
+      performCopy(text, el);
+      removeActionMenu();
+    };
+
+    const downloadBtn = document.createElement("button");
+    downloadBtn.className = "download-btn";
+    downloadBtn.textContent = "Save as .txt";
+    downloadBtn.onclick = () => {
+      performDownload(text);
+      removeActionMenu();
+    };
+
+    const hint = document.createElement("div");
+    hint.className = "menu-hint";
+    hint.textContent = "Esc to cancel";
+
+    actionMenu.appendChild(copyBtn);
+    actionMenu.appendChild(downloadBtn);
+    actionMenu.appendChild(hint);
+
+    document.body.appendChild(actionMenu);
+
+    // Position menu
+    const menuRect = actionMenu.getBoundingClientRect();
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let posX = x + scrollX;
+    let posY = y + scrollY;
+
+    // Adjust if it goes off screen
+    if (x + menuRect.width > viewportWidth) posX -= menuRect.width;
+    if (y + menuRect.height > viewportHeight) posY -= menuRect.height;
+
+    actionMenu.style.left = `${posX}px`;
+    actionMenu.style.top = `${posY}px`;
+
+    // Close menu when clicking elsewhere
+    const closeMenu = (e) => {
+      if (actionMenu && !actionMenu.contains(e.target)) {
+        removeActionMenu();
+        document.removeEventListener("mousedown", closeMenu, true);
+      }
+    };
+    document.addEventListener("mousedown", closeMenu, true);
+  }
+
+  function removeActionMenu() {
+    if (actionMenu) {
+      actionMenu.remove();
+      actionMenu = null;
+    }
+  }
+
   function handleClick(e) {
     if (!active || !currentFocusElement) return;
+
+    // If clicking on the action menu itself, let it happen
+    if (actionMenu && actionMenu.contains(e.target)) return;
 
     e.preventDefault();
     e.stopPropagation();
@@ -165,49 +292,12 @@
     chrome.storage.local.get(["clickAction"], (result) => {
       const action = result.clickAction || "download";
 
-      if (action === "copy") {
-        navigator.clipboard
-          .writeText(text)
-          .then(() => {
-            // Visual feedback
-            isCopiedState = true;
-            label.innerHTML = "<span>Copied!</span>";
-            label.classList.add("copied");
-
-            setTimeout(() => {
-              isCopiedState = false;
-              if (label) {
-                label.classList.remove("copied");
-                updateOverlay(currentFocusElement);
-              }
-            }, 1000);
-          })
-          .catch((err) => {
-            console.error("Failed to copy text: ", err);
-          });
+      if (action === "ask") {
+        showActionMenu(e.clientX, e.clientY, text, currentFocusElement);
+      } else if (action === "copy") {
+        performCopy(text, currentFocusElement);
       } else {
-        const filename =
-          (document.title || "extracted_text")
-            .replace(/[^a-z0-9]/gi, "_")
-            .toLowerCase() + ".txt";
-
-        chrome.runtime.sendMessage(
-          {
-            action: "download_text",
-            text: text,
-            filename: filename,
-          },
-          (response) => {
-            if (response && response.success) {
-              console.log("Text saved successfully");
-            } else {
-              console.error(
-                "Failed to save text",
-                response ? response.error : "No response"
-              );
-            }
-          }
-        );
+        performDownload(text);
       }
     });
   }
@@ -232,6 +322,7 @@
       }
     } else {
       removeOverlay();
+      removeActionMenu();
       document.removeEventListener("mousemove", handleMouseMove, true);
       document.removeEventListener("keydown", handleKeyDown, true);
       document.removeEventListener("click", handleClick, true);
