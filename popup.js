@@ -2,21 +2,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("toggleBtn");
   const downloadBtn = document.getElementById("downloadAction");
   const copyBtn = document.getElementById("copyAction");
-  const toggleKbd = document.getElementById("toggleKbd");
+  const toggleKbdContainer = document.getElementById("toggleKbdContainer");
 
   // Update shortcut display based on platform
   const ua = navigator.userAgent.toUpperCase();
   const isMac = ua.indexOf("MAC") >= 0;
-  const isWindows = ua.indexOf("WIN") >= 0;
 
-  if (toggleKbd) {
-    if (isMac) {
-      toggleKbd.textContent = "⌘⇧X";
-    } else if (isWindows) {
-      toggleKbd.textContent = "Ctrl+Shift+X";
-    } else {
-      toggleKbd.textContent = "Ctrl+Shift+X"; // Default
-    }
+  if (toggleKbdContainer) {
+    const keys = isMac ? ["Cmd", "Shift", "X"] : ["Ctrl", "Shift", "X"];
+    toggleKbdContainer.innerHTML = keys
+      .map((key) => `<kbd>${key}</kbd>`)
+      .join("");
   }
 
   // Get current status from storage
