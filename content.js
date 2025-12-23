@@ -51,7 +51,7 @@
     const text = (el.innerText || "").trim();
     const tagName = el.tagName.toLowerCase();
 
-    label.innerHTML = `<span class="ext-text-extractor-tag">${tagName}</span><span>Chars: ${text.length}</span>`;
+    label.innerHTML = `<span class="ext-text-extractor-tag">${tagName}</span><span>${text.length}</span>`;
 
     // Calculate label positioning
     const viewportWidth = window.innerWidth;
