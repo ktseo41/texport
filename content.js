@@ -5,6 +5,7 @@
   let currentFocusElement = null;
   let overlay = null;
   let label = null;
+  let isCopiedState = false;
 
   let lastMouseX = 0;
   let lastMouseY = 0;
@@ -45,19 +46,41 @@
     overlay.style.width = `${rect.width}px`;
     overlay.style.height = `${rect.height}px`;
 
+    if (isCopiedState) return;
+
     const text = (el.innerText || "").trim();
     const tagName = el.tagName.toLowerCase();
 
     label.innerHTML = `<span class="ext-text-extractor-tag">${tagName}</span><span>Chars: ${text.length}</span>`;
 
-    // Adjust label position if too close to top
-    if (rect.top < 40) {
-      label.style.top = "100%";
-      label.style.marginTop = "4px";
-    } else {
-      label.style.top = "-28px";
-      label.style.marginTop = "0";
+    // Calculate label positioning
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const labelRect = label.getBoundingClientRect();
+
+    // Horizontal: alignment to the right of the element, clamped to viewport
+    let desiredX = rect.right - labelRect.width;
+    if (desiredX + labelRect.width > viewportWidth - 10) {
+      desiredX = viewportWidth - labelRect.width - 10;
     }
+    if (desiredX < 10) {
+      desiredX = 10;
+    }
+
+    // Vertical: above the element, clamped to viewport and element bounds
+    let desiredY = rect.top - labelRect.height - 4;
+    if (desiredY < 10) {
+      // If no space above, try placing it inside at the top
+      desiredY = Math.max(10, rect.top + 4);
+    }
+    // Ensure it doesn't go below the element's actual bottom or viewport bottom
+    desiredY = Math.min(desiredY, rect.bottom - labelRect.height - 4);
+    desiredY = Math.min(desiredY, viewportHeight - labelRect.height - 10);
+
+    // Set position relative to the overlay
+    label.style.left = `${desiredX - rect.left}px`;
+    label.style.top = `${desiredY - rect.top}px`;
+    label.style.marginTop = "0";
   }
 
   function handleMouseMove(e) {
@@ -147,14 +170,15 @@
           .writeText(text)
           .then(() => {
             // Visual feedback
-            const originalLabel = label.textContent;
-            label.textContent = "Copied!";
-            label.style.backgroundColor = "#28a745"; // Success green
+            isCopiedState = true;
+            label.innerHTML = "<span>Copied!</span>";
+            label.classList.add("copied");
 
             setTimeout(() => {
+              isCopiedState = false;
               if (label) {
-                label.textContent = originalLabel;
-                label.style.backgroundColor = "";
+                label.classList.remove("copied");
+                updateOverlay(currentFocusElement);
               }
             }, 1000);
           })

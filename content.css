@@ -28,7 +28,6 @@
 .ext-text-extractor-label {
   position: absolute;
   top: -28px;
-  right: 0;
   background: linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));
   color: white;
   padding: 4px 10px;
@@ -43,6 +42,11 @@
   align-items: center;
   gap: 6px;
   pointer-events: auto;
+  transition: background-color 0.3s ease;
+}
+
+.ext-text-extractor-label.copied {
+  background: #28a745 !important;
 }
 
 .ext-text-extractor-tag {
