@@ -87,7 +87,7 @@
       .action-btn.active {
         background: white;
         color: #007bff;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         font-weight: bold;
       }
       .shortcuts {
@@ -121,7 +121,8 @@
         line-height: 1;
         padding: 4px 6px;
         white-space: nowrap;
-        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
+          monospace;
       }
     </style>
   </head>
@@ -132,13 +133,23 @@
         <h2>Text Extractor</h2>
       </div>
       <button id="toggleBtn" class="toggle-btn">Activate</button>
-      
+
       <div class="action-selector">
         <label>Result Action</label>
         <div class="btn-group">
-          <button id="downloadAction" class="action-btn active" data-action="download">Download</button>
-          <button id="copyAction" class="action-btn" data-action="copy">Copy</button>
-          <button id="askAction" class="action-btn" data-action="ask">Ask</button>
+          <button
+            id="downloadAction"
+            class="action-btn active"
+            data-action="download"
+          >
+            Download
+          </button>
+          <button id="copyAction" class="action-btn" data-action="copy">
+            Copy
+          </button>
+          <button id="askAction" class="action-btn" data-action="ask">
+            Ask
+          </button>
         </div>
       </div>
 
@@ -168,6 +179,6 @@
         </div>
       </div>
     </div>
-    <script src="popup.js"></script>
+    <script type="module" src="popup.ts"></script>
   </body>
 </html>

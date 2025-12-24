@@ -1,15 +1,15 @@
-// content.js
+// content.ts
 (function () {
-  let active = false;
-  let hoveredElement = null;
-  let currentFocusElement = null;
-  let overlay = null;
-  let label = null;
-  let actionMenu = null;
-  let isCopiedState = false;
+  let active: boolean = false;
+  let hoveredElement: HTMLElement | null = null;
+  let currentFocusElement: HTMLElement | null = null;
+  let overlay: HTMLDivElement | null = null;
+  let label: HTMLDivElement | null = null;
+  let actionMenu: HTMLDivElement | null = null;
+  let isCopiedState: boolean = false;
 
-  let lastMouseX = 0;
-  let lastMouseY = 0;
+  let lastMouseX: number = 0;
+  let lastMouseY: number = 0;
 
   function createOverlay() {
     if (overlay) return;
@@ -31,9 +31,11 @@
     }
   }
 
-  function updateOverlay(el) {
+  function updateOverlay(el: HTMLElement | null) {
+    if (!overlay || !label) return;
+
     if (!el || !active) {
-      if (overlay) overlay.style.display = "none";
+      overlay.style.display = "none";
       return;
     }
 
@@ -84,15 +86,15 @@
     label.style.marginTop = "0";
   }
 
-  function handleMouseMove(e) {
+  function handleMouseMove(e: MouseEvent) {
     lastMouseX = e.clientX;
     lastMouseY = e.clientY;
 
     if (!active) return;
     if (actionMenu) return; // Don't highlight while menu is open
 
-    const el = document.elementFromPoint(e.clientX, e.clientY);
-    if (el && el !== overlay && !overlay.contains(el)) {
+    const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+    if (el && overlay && el !== overlay && !overlay.contains(el)) {
       if (hoveredElement !== el) {
         hoveredElement = el;
         currentFocusElement = el;
@@ -101,7 +103,7 @@
     }
   }
 
-  function handleKeyDown(e) {
+  function handleKeyDown(e: KeyboardEvent) {
     if (!active) return;
 
     if (e.key === "Escape") {
@@ -117,8 +119,8 @@
 
     // Ensure we have a focus element if keys are pressed
     if (!currentFocusElement) {
-      const el = document.elementFromPoint(lastMouseX, lastMouseY);
-      if (el && el !== overlay && !overlay.contains(el)) {
+      const el = document.elementFromPoint(lastMouseX, lastMouseY) as HTMLElement | null;
+      if (el && overlay && el !== overlay && !overlay.contains(el)) {
         hoveredElement = el;
         currentFocusElement = el;
         updateOverlay(currentFocusElement);
@@ -134,7 +136,7 @@
         currentFocusElement.parentElement &&
         currentFocusElement.parentElement !== document.documentElement
       ) {
-        currentFocusElement = currentFocusElement.parentElement;
+        currentFocusElement = currentFocusElement.parentElement as HTMLElement;
         updateOverlay(currentFocusElement);
         triggerPulse();
       }
@@ -147,9 +149,9 @@
         currentFocusElement.contains(hoveredElement) &&
         currentFocusElement !== hoveredElement
       ) {
-        let child = hoveredElement;
+        let child: HTMLElement = hoveredElement;
         while (child.parentElement !== currentFocusElement) {
-          child = child.parentElement;
+          child = child.parentElement as HTMLElement;
         }
         currentFocusElement = child;
         updateOverlay(currentFocusElement);
@@ -165,14 +167,15 @@
     overlay.classList.add("pulse");
   }
 
-  function performCopy(text, el) {
+  function performCopy(text: string, el: HTMLElement) {
+    if (!label) return;
     navigator.clipboard
       .writeText(text)
       .then(() => {
         // Visual feedback
         isCopiedState = true;
-        label.innerHTML = "<span>Copied!</span>";
-        label.classList.add("copied");
+        label!.innerHTML = "<span>Copied!</span>";
+        label!.classList.add("copied");
 
         setTimeout(() => {
           isCopiedState = false;
@@ -187,7 +190,7 @@
       });
   }
 
-  function performDownload(text) {
+  function performDownload(text: string) {
     const filename =
       (document.title || "extracted_text")
         .replace(/[^a-z0-9]/gi, "_")
@@ -212,7 +215,7 @@
     );
   }
 
-  function showActionMenu(x, y, text, el) {
+  function showActionMenu(x: number, y: number, text: string, el: HTMLElement) {
     removeActionMenu();
 
     actionMenu = document.createElement("div");
@@ -262,8 +265,8 @@
     actionMenu.style.top = `${posY}px`;
 
     // Close menu when clicking elsewhere
-    const closeMenu = (e) => {
-      if (actionMenu && !actionMenu.contains(e.target)) {
+    const closeMenu = (e: MouseEvent) => {
+      if (actionMenu && !actionMenu.contains(e.target as Node)) {
         removeActionMenu();
         document.removeEventListener("mousedown", closeMenu, true);
       }
@@ -278,11 +281,11 @@
     }
   }
 
-  function handleClick(e) {
+  function handleClick(e: MouseEvent) {
     if (!active || !currentFocusElement) return;
 
     // If clicking on the action menu itself, let it happen
-    if (actionMenu && actionMenu.contains(e.target)) return;
+    if (actionMenu && actionMenu.contains(e.target as Node)) return;
 
     e.preventDefault();
     e.stopPropagation();
@@ -293,16 +296,16 @@
       const action = result.clickAction || "download";
 
       if (action === "ask") {
-        showActionMenu(e.clientX, e.clientY, text, currentFocusElement);
+        showActionMenu(e.clientX, e.clientY, text, currentFocusElement!);
       } else if (action === "copy") {
-        performCopy(text, currentFocusElement);
+        performCopy(text, currentFocusElement!);
       } else {
         performDownload(text);
       }
     });
   }
 
-  function toggleActive(state) {
+  function toggleActive(state: boolean) {
     if (active === state) return;
     active = state;
     if (active) {
@@ -314,7 +317,7 @@
       document.body.style.cursor = "crosshair";
 
       // Initial check for element under mouse
-      const el = document.elementFromPoint(lastMouseX, lastMouseY);
+      const el = document.elementFromPoint(lastMouseX, lastMouseY) as HTMLElement | null;
       if (el) {
         hoveredElement = el;
         currentFocusElement = el;
@@ -345,7 +348,7 @@
   // Listen for storage changes to sync state across all tabs
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "local" && changes.enabled) {
-      toggleActive(changes.enabled.newValue);
+      toggleActive(!!changes.enabled.newValue);
     }
   });
 

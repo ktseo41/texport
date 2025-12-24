@@ -1,10 +1,11 @@
+// service_worker.ts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "download_text") {
     const blob = new Blob([request.text], { type: "text/plain" });
     const reader = new FileReader();
 
     reader.onload = function () {
-      const url = reader.result;
+      const url = reader.result as string;
       chrome.downloads.download(
         {
           url: url,
