@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Extract Webpage Text",
+  "name": "Texport",
   "version": "1.0",
-  "description": "Extract text from selected webpage elements and save as .txt",
+  "description": "Smart DOM-navigation text extractor and exporter",
   "permissions": [
     "downloads",
     "storage",

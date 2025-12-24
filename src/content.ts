@@ -14,10 +14,10 @@
   function createOverlay() {
     if (overlay) return;
     overlay = document.createElement("div");
-    overlay.className = "ext-text-extractor-overlay";
+    overlay.className = "texport-overlay";
 
     label = document.createElement("div");
-    label.className = "ext-text-extractor-label";
+    label.className = "texport-label";
     overlay.appendChild(label);
 
     document.body.appendChild(overlay);
@@ -52,7 +52,7 @@
     const text = (el.innerText || "").trim();
     const tagName = el.tagName.toLowerCase();
 
-    label.innerHTML = `<span class="ext-text-extractor-tag">${tagName}</span><span>${text.length}</span>`;
+    label.innerHTML = `<span class="texport-tag">${tagName}</span><span>${text.length}</span>`;
 
     // Calculate label positioning
     const viewportWidth = window.innerWidth;
@@ -240,7 +240,7 @@
     removeActionMenu();
 
     actionMenu = document.createElement("div");
-    actionMenu.className = "ext-text-extractor-menu";
+    actionMenu.className = "texport-menu";
 
     const copyBtn = document.createElement("button");
     copyBtn.className = "copy-btn";

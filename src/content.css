@@ -1,5 +1,4 @@
-/* content.css */
-.ext-text-extractor-overlay {
+.texport-overlay {
   position: fixed;
   pointer-events: none;
   background-color: rgba(0, 123, 255, 0.1);
@@ -10,11 +9,11 @@
   will-change: top, left, width, height;
 }
 
-.ext-text-extractor-overlay.pulse {
-  animation: ext-pulse 0.3s ease-out;
+.texport-overlay.pulse {
+  animation: texport-pulse 0.3s ease-out;
 }
 
-@keyframes ext-pulse {
+@keyframes texport-pulse {
   0% {
     box-shadow: 0 0 0px 0px rgba(0, 123, 255, 0.5);
     background-color: rgba(0, 123, 255, 0.2);
@@ -25,7 +24,7 @@
   }
 }
 
-.ext-text-extractor-label {
+.texport-label {
   position: absolute;
   top: -28px;
   background: linear-gradient(
@@ -50,11 +49,11 @@
   transition: background-color 0.3s ease;
 }
 
-.ext-text-extractor-label.copied {
+.texport-label.copied {
   background: #28a745 !important;
 }
 
-.ext-text-extractor-tag {
+.texport-tag {
   opacity: 0.8;
   font-weight: 400;
   border-right: 1px solid rgba(255, 255, 255, 0.3);
@@ -63,7 +62,7 @@
 }
 
 /* Action Menu */
-.ext-text-extractor-menu {
+.texport-menu {
   position: absolute;
   background: white;
   border-radius: 8px;
@@ -76,7 +75,7 @@
   border: 1px solid #e9ecef;
 }
 
-.ext-text-extractor-menu button {
+.texport-menu button {
   background: transparent;
   border: none;
   padding: 8px 12px;
@@ -92,20 +91,20 @@
   gap: 8px;
 }
 
-.ext-text-extractor-menu button:hover {
+.texport-menu button:hover {
   background-color: #f1f3f5;
   color: #007bff;
 }
 
-.ext-text-extractor-menu button.download-btn::before {
+.texport-menu button.download-btn::before {
   content: "📥";
 }
 
-.ext-text-extractor-menu button.copy-btn::before {
+.texport-menu button.copy-btn::before {
   content: "📋";
 }
 
-.ext-text-extractor-menu .menu-hint {
+.texport-menu .menu-hint {
   font-size: 12px;
   color: #868e96;
   text-align: center;
