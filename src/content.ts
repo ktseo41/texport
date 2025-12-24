@@ -40,12 +40,10 @@
     }
 
     const rect = el.getBoundingClientRect();
-    const scrollX = window.scrollX;
-    const scrollY = window.scrollY;
 
     overlay.style.display = "block";
-    overlay.style.top = `${rect.top + scrollY}px`;
-    overlay.style.left = `${rect.left + scrollX}px`;
+    overlay.style.top = `${rect.top}px`;
+    overlay.style.left = `${rect.left}px`;
     overlay.style.width = `${rect.width}px`;
     overlay.style.height = `${rect.height}px`;
 
@@ -86,6 +84,8 @@
     label.style.marginTop = "0";
   }
 
+  let rafId: number | null = null;
+
   function handleMouseMove(e: MouseEvent) {
     lastMouseX = e.clientX;
     lastMouseY = e.clientY;
@@ -93,14 +93,30 @@
     if (!active) return;
     if (actionMenu) return; // Don't highlight while menu is open
 
-    const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
-    if (el && overlay && el !== overlay && !overlay.contains(el)) {
-      if (hoveredElement !== el) {
-        hoveredElement = el;
-        currentFocusElement = el;
-        updateOverlay(currentFocusElement);
-      }
+    if (rafId) {
+      cancelAnimationFrame(rafId);
     }
+
+    rafId = requestAnimationFrame(() => {
+      const el = document.elementFromPoint(lastMouseX, lastMouseY) as HTMLElement | null;
+      if (el && overlay && el !== overlay && !overlay.contains(el)) {
+        if (hoveredElement !== el) {
+          hoveredElement = el;
+          currentFocusElement = el;
+          updateOverlay(currentFocusElement);
+        }
+      }
+      rafId = null;
+    });
+  }
+
+  function handleScroll() {
+    if (!active || !currentFocusElement) return;
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => {
+      updateOverlay(currentFocusElement);
+      rafId = null;
+    });
   }
 
   function handleKeyDown(e: KeyboardEvent) {
@@ -116,6 +132,11 @@
     }
 
     if (actionMenu) return; // Disable navigation while menu is open
+
+    handleKeyNavigation(e);
+  }
+
+  function handleKeyNavigation(e: KeyboardEvent) {
 
     // Ensure we have a focus element if keys are pressed
     if (!currentFocusElement) {
@@ -314,6 +335,7 @@
       document.addEventListener("mousemove", handleMouseMove, true);
       document.addEventListener("keydown", handleKeyDown, true);
       document.addEventListener("click", handleClick, true);
+      window.addEventListener("scroll", handleScroll, { passive: true });
       document.body.style.cursor = "crosshair";
 
       // Initial check for element under mouse
@@ -329,6 +351,7 @@
       document.removeEventListener("mousemove", handleMouseMove, true);
       document.removeEventListener("keydown", handleKeyDown, true);
       document.removeEventListener("click", handleClick, true);
+      window.removeEventListener("scroll", handleScroll);
       document.body.style.cursor = "";
       hoveredElement = null;
       currentFocusElement = null;
