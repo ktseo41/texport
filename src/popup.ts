@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const actionButtons = [downloadBtn, copyBtn, askBtn];
+  const changeShortcutLink = document.getElementById("changeShortcutLink") as HTMLSpanElement | null;
 
   // Update shortcut display based on platform
   const ua = navigator.userAgent.toUpperCase();
@@ -27,7 +28,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // Get current status from storage
   chrome.storage.local.get(["enabled", "clickAction"], (result) => {
     updateUI(!!result.enabled);
+    updateBadge(!!result.enabled);
     updateActionUI((result.clickAction as string) || "download");
+  });
+
+  // Fetch actual commands from Chrome
+  chrome.commands.getAll((commands) => {
+    const toggleCommand = commands.find((c) => c.name === "toggle-activation");
+    if (toggleCommand && toggleCommand.shortcut && toggleKbdContainer) {
+      const keys = toggleCommand.shortcut.split("+");
+      toggleKbdContainer.innerHTML = keys
+        .map((key) => `<kbd>${key}</kbd>`)
+        .join("");
+    }
   });
 
   toggleBtn.addEventListener("click", () => {
@@ -35,6 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const newState = !result.enabled;
       chrome.storage.local.set({ enabled: newState }, () => {
         updateUI(newState);
+        updateBadge(newState);
 
         // Notify content script in all tabs
         chrome.tabs.query({}, (tabs) => {
@@ -68,6 +82,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Shortcut management listeners
+  const openShortcuts = () => {
+    chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
+  };
+
+  changeShortcutLink?.addEventListener("click", openShortcuts);
+
   function updateUI(isEnabled: boolean) {
     if (!toggleBtn) return;
     if (isEnabled) {
@@ -77,6 +98,13 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleBtn.textContent = "Activate";
       toggleBtn.classList.remove("active");
     }
+  }
+
+  function updateBadge(isEnabled: boolean) {
+    chrome.action.setBadgeText({ text: isEnabled ? "ON" : "" });
+    chrome.action.setBadgeBackgroundColor({
+      color: isEnabled ? "#4CAF50" : "#808080",
+    });
   }
 
   function updateActionUI(action: string) {
@@ -94,6 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (area === "local") {
       if (changes.enabled) {
         updateUI(!!changes.enabled.newValue);
+        updateBadge(!!changes.enabled.newValue);
       }
       if (changes.clickAction) {
         updateActionUI(changes.clickAction.newValue as string);

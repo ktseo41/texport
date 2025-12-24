@@ -124,6 +124,19 @@
         font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
           monospace;
       }
+      .change-link {
+        font-size: 10px;
+        color: #007bff;
+        cursor: pointer;
+        text-decoration: underline;
+        margin-right: 8px;
+        font-weight: 500;
+        flex-shrink: 0;
+      }
+      .shortcut-label {
+        flex-shrink: 0;
+        margin-right: 15px;
+      }
     </style>
   </head>
   <body>
@@ -155,25 +168,25 @@
 
       <div class="shortcuts">
         <div class="shortcut-item">
-          <span>Toggle Mode</span>
-          <div class="shortcut-keys" id="toggleKbdContainer">
-            <!-- Will be populated by popup.js -->
-            <kbd>Ctrl</kbd>
-            <kbd>Shift</kbd>
-            <kbd>X</kbd>
+          <span class="shortcut-label">Toggle Mode</span>
+          <div style="display: flex; align-items: center; flex: 1; justify-content: flex-end;">
+            <span class="change-link" id="changeShortcutLink">Change</span>
+            <div class="shortcut-keys" id="toggleKbdContainer">
+              <!-- Will be populated by popup.js -->
+            </div>
           </div>
         </div>
         <div class="shortcut-item">
-          <span>Navigate</span>
-          <div class="shortcut-keys">
+          <span class="shortcut-label">Navigate</span>
+          <div class="shortcut-keys" style="flex: 1; justify-content: flex-end;">
             <kbd>↑</kbd>
-            <span>/</span>
+            <span style="margin: 0 2px; color: #ccc;">/</span>
             <kbd>↓</kbd>
           </div>
         </div>
         <div class="shortcut-item">
-          <span>Deactivate / Cancel Menu</span>
-          <div class="shortcut-keys">
+          <span class="shortcut-label">Deactivate</span>
+          <div class="shortcut-keys" style="flex: 1; justify-content: flex-end;">
             <kbd>Esc</kbd>
           </div>
         </div>

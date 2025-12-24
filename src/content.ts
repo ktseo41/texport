@@ -352,7 +352,7 @@
     }
   });
 
-  // Initialize state from storage (optional, but good for persistence)
+  // Initialize state from storage
   chrome.storage.local.get(["enabled"], (result) => {
     if (result.enabled) {
       toggleActive(true);

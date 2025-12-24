@@ -37,6 +37,10 @@ chrome.commands.onCommand.addListener((command) => {
     chrome.storage.local.get(["enabled"], (result) => {
       const newState = !result.enabled;
       chrome.storage.local.set({ enabled: newState });
+      
+      // Update badge for immediate feedback
+      chrome.action.setBadgeText({ text: newState ? "ON" : "" });
+      chrome.action.setBadgeBackgroundColor({ color: newState ? "#4CAF50" : "#808080" });
     });
   }
 });
