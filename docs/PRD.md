@@ -13,7 +13,7 @@ The **Webpage Text Extractor** is a Chrome Extension designed to simplify the pr
   - **Copy**: Copy the selected text to the clipboard.
   - **Ask**: Displays a context menu on click, allowing the user to choose between Download and Copy.
 - **Keyboard Shortcuts**:
-  - `Ctrl+Shift+X` (Windows/Linux) or `Cmd+Shift+X` (macOS) to toggle extraction mode.
+  - `Ctrl + Shift + X` (Windows/Linux) or `Cmd + Shift + X` (macOS) to toggle extraction mode.
   - `ArrowUp` / `ArrowDown` for hierarchy navigation.
   - `Esc` to deactivate extraction mode or cancel the "Ask" menu.
 - **Sleek Interface**: A modern popup UI with real-time status updates, action selection, and a shortcut guide.
@@ -68,7 +68,7 @@ The **Webpage Text Extractor** is a Chrome Extension designed to simplify the pr
 
 - **feat**: Added "Copy to Clipboard" option in popup settings.
 - **feat**: Enhanced overlay with HTML tag name display and pulse animation for better hierarchy navigation feedback.
-- **feat**: Implemented keyboard shortcuts for quick activation.
+- **feat**: Implemented keyboard shortcuts for quick activation (e.g., `Cmd + Shift + X`).
 - **fix**: Fixed focus persistence issues when activating from the popup.
 
 ---

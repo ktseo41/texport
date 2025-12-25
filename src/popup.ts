@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const keys = isMac ? ["Cmd", "Shift", "X"] : ["Ctrl", "Shift", "X"];
     toggleKbdContainer.innerHTML = keys
       .map((key) => `<kbd>${key}</kbd>`)
-      .join("");
+      .join('<span class="shortcut-plus">+</span>');
   }
 
   // Get current status from storage
@@ -36,12 +36,39 @@ document.addEventListener("DOMContentLoaded", () => {
   chrome.commands.getAll((commands) => {
     const toggleCommand = commands.find((c) => c.name === "toggle-activation");
     if (toggleCommand && toggleCommand.shortcut && toggleKbdContainer) {
-      const keys = toggleCommand.shortcut.split("+");
+      const keys = parseShortcut(toggleCommand.shortcut);
       toggleKbdContainer.innerHTML = keys
-        .map((key) => `<kbd>${key}</kbd>`)
-        .join("");
+        .map((key) => `<kbd>${key === "Command" ? "Cmd" : key}</kbd>`)
+        .join('<span class="shortcut-plus">+</span>');
     }
   });
+
+  function parseShortcut(shortcut: string): string[] {
+    if (shortcut.includes("+")) {
+      return shortcut.split("+").map((s) => s.trim());
+    }
+
+    const map: { [key: string]: string } = {
+      "⌘": "Cmd",
+      "⇧": "Shift",
+      "⌥": "Option",
+      "⌃": "Ctrl",
+    };
+
+    const result: string[] = [];
+    let i = 0;
+    while (i < shortcut.length) {
+      const char = shortcut[i];
+      if (map[char]) {
+        result.push(map[char]);
+        i++;
+      } else {
+        result.push(shortcut.slice(i));
+        break;
+      }
+    }
+    return result.length > 0 ? result : [shortcut];
+  }
 
   toggleBtn.addEventListener("click", () => {
     chrome.storage.local.get(["enabled"], (result) => {
