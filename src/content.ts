@@ -1,18 +1,5 @@
 // content.ts
 
-interface Position {
-  x: number;
-  y: number;
-}
-
-interface Rect {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-  right: number;
-  bottom: number;
-}
 
 class OverlayManager {
   private overlay: HTMLDivElement | null = null;
