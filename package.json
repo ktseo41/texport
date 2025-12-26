@@ -10,7 +10,8 @@
     "build": "vite build",
     "watch": "vite build --watch",
     "dev": "vite",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "package": "pnpm build && cd dist && zip -r ../texport-$(node -p \"require('./manifest.json').version\").zip ."
   },
   "repository": {
     "type": "git",
