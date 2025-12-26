@@ -92,7 +92,7 @@ Main controller class that orchestrates the extension's behavior.
 
 ## Changelog
 
-### Version 1.3 (Dec 26, 2025)
+### Version 1.3.0 (Dec 26, 2025)
 
 - **refactor**: Migrated codebase from JavaScript to **TypeScript** for improved type safety.
 - **refactor**: Introduced **class-based architecture** (`OverlayManager`, `ActionMenuManager`, `TextExporter`) for better modularity and maintainability.
@@ -100,7 +100,7 @@ Main controller class that orchestrates the extension's behavior.
 - **feat**: Auto-generates **filename from document title** for downloads.
 - **docs**: Updated PRD to reflect TypeScript migration and new architecture.
 
-### Version 1.2 (Dec 23, 2025)
+### Version 1.2.0 (Dec 23, 2025)
 
 - **feat**: Added **"Ask" mode**, providing a context menu on click to choose between Copy and Download.
 - **feat**: Added project icons (16, 48, 128) and integrated them into the manifest and UI.
@@ -113,7 +113,7 @@ Main controller class that orchestrates the extension's behavior.
 - **fix**: Improved hierarchy navigation logic and overlay positioning.
 - **fix**: Enhanced cleanup routines for the action menu and event listeners on deactivation.
 
-### Version 1.1 (Dec 22, 2025)
+### Version 1.1.0 (Dec 22, 2025)
 
 - **feat**: Added "Copy to Clipboard" option in popup settings.
 - **feat**: Enhanced overlay with HTML tag name display and pulse animation for better hierarchy navigation feedback.
