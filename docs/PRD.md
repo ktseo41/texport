@@ -19,7 +19,6 @@ I developed this tool to solve these frustrations and to **"instantly extract on
 While Texport offers precision, it has some known limitations:
 
 - **Scattered Content**: Extracting text spread across multiple separate sections requires repeated manual actions for each part.
-- **Viewport Boundary Issues**: When an element extends beyond the current viewport, it can be difficult to visualize the exact boundaries (start/end) of the selection.
 - **Designed for Manual Precision**: As a human-driven tool, it is not suitable for large-scale automated data scraping across hundreds of pages.
 
 ## Key Features
@@ -38,7 +37,8 @@ While Texport offers precision, it has some known limitations:
 - **Visual Indicators**:
   - **Badge**: Shows "ON" badge when extraction mode is active.
   - **Crosshair Cursor**: Changes cursor to crosshair when active for precise element selection.
-  - **Scroll Tracking**: Overlay follows the selected element on scroll.
+  - **Mini-map**: Displays a context-aware mini-map in the top-right corner to visualize the selected element's position and boundaries relative to the entire page.
+  - **Scroll Tracking**: Overlay and Mini-map update in real-time on scroll.
 - **Sleek Interface**: A modern popup UI with real-time status updates, action selection, and a shortcut guide.
 
 ## File Structure
