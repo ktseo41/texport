@@ -4,6 +4,9 @@
 class OverlayManager {
   private overlay: HTMLDivElement | null = null;
   private label: HTMLDivElement | null = null;
+  private miniMap: HTMLDivElement | null = null;
+  private miniMapElement: HTMLDivElement | null = null;
+  private miniMapViewport: HTMLDivElement | null = null;
   private isCopiedState: boolean = false;
 
   constructor() {}
@@ -17,7 +20,20 @@ class OverlayManager {
     this.label.className = "texport-label";
     this.overlay.appendChild(this.label);
 
+    this.miniMap = document.createElement("div");
+    this.miniMap.className = "texport-minimap";
+    
+    this.miniMapElement = document.createElement("div");
+    this.miniMapElement.className = "texport-minimap-element";
+    
+    this.miniMapViewport = document.createElement("div");
+    this.miniMapViewport.className = "texport-minimap-viewport";
+    
+    this.miniMap.appendChild(this.miniMapElement);
+    this.miniMap.appendChild(this.miniMapViewport);
+
     document.body.appendChild(this.overlay);
+    document.body.appendChild(this.miniMap);
   }
 
   public remove(): void {
@@ -25,6 +41,12 @@ class OverlayManager {
       this.overlay.remove();
       this.overlay = null;
       this.label = null;
+    }
+    if (this.miniMap) {
+      this.miniMap.remove();
+      this.miniMap = null;
+      this.miniMapElement = null;
+      this.miniMapViewport = null;
     }
   }
 
@@ -50,6 +72,42 @@ class OverlayManager {
     this.label.innerHTML = `<span class="texport-tag">${tagName}</span><span>${text.length}</span>`;
 
     this.updateLabelPosition(rect);
+    this.updateMiniMap(el, rect);
+  }
+
+  private updateMiniMap(el: HTMLElement, rect: DOMRect): void {
+    if (!this.miniMap || !this.miniMapElement || !this.miniMapViewport) return;
+
+    const docHeight = Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight,
+      document.body.offsetHeight,
+      document.documentElement.offsetHeight,
+      document.body.clientHeight,
+      document.documentElement.clientHeight
+    );
+    const viewportHeight = window.innerHeight;
+    const currentScrollY = window.scrollY;
+
+    // Element absolute position
+    const elementTop = rect.top + currentScrollY;
+    const elementHeight = rect.height;
+
+    // Only show mini-map if element height OR document height is large
+    if (elementHeight <= viewportHeight * 1.1 && docHeight <= viewportHeight * 1.5) {
+      this.miniMap.style.display = "none";
+      return;
+    }
+
+    this.miniMap.style.display = "block";
+
+    // 1. Position the element in the mini-map (Static relative to page)
+    this.miniMapElement.style.top = `${(elementTop / docHeight) * 100}%`;
+    this.miniMapElement.style.height = `${(elementHeight / docHeight) * 100}%`;
+
+    // 2. Position the viewport in the mini-map (Moves on scroll)
+    this.miniMapViewport.style.top = `${(currentScrollY / docHeight) * 100}%`;
+    this.miniMapViewport.style.height = `${(viewportHeight / docHeight) * 100}%`;
   }
 
   private updateLabelPosition(rect: DOMRect): void {

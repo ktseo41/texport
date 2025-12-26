@@ -115,3 +115,41 @@
   margin-top: 2px;
   font-weight: 500;
 }
+
+/* Mini-map */
+.texport-minimap {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  z-index: 1000003;
+  pointer-events: none;
+  display: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.texport-minimap-element {
+  position: absolute;
+  width: 100%;
+  background: rgba(0, 123, 255, 0.15);
+  border-top: 1px solid rgba(0, 123, 255, 0.2);
+  border-bottom: 1px solid rgba(0, 123, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+.texport-minimap-viewport {
+  position: absolute;
+  width: 100%;
+  border: 1.5px solid #007bff;
+  box-sizing: border-box;
+  background: rgba(0, 123, 255, 0.05);
+  z-index: 1000004;
+  transition: top 0.1s linear, height 0.1s linear;
+}
