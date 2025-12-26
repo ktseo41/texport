@@ -289,8 +289,11 @@ class TextExporter {
   };
 
   private isSelectable(el: HTMLElement): boolean {
-    // Basic check to avoid selecting the overlay itself
-    return !el.classList.contains("texport-overlay") && !el.closest(".texport-overlay");
+    // Basic check to avoid selecting the overlay or the menu itself
+    return !el.classList.contains("texport-overlay") && 
+           !el.closest(".texport-overlay") &&
+           !el.classList.contains("texport-menu") &&
+           !el.closest(".texport-menu");
   }
 
   private handleScroll = (): void => {
@@ -370,6 +373,7 @@ class TextExporter {
     chrome.storage.local.get(["clickAction"], (result) => {
       const action = result.clickAction || "download";
       if (action === "ask") {
+        this.overlayManager.update(null, false);
         this.actionMenuManager.show(e.clientX, e.clientY);
       } else if (action === "copy") {
         this.handleCopy();
