@@ -4,6 +4,24 @@
 
 The **Webpage Text Extractor (Texport)** is a Chrome Extension designed to simplify the process of extracting textual content from web pages. It provides a visual interface for users to select specific DOM elements, navigate the document hierarchy, and export the content directly. This tool is ideal for developers, researchers, and content creators who need to quickly grab clean text from complex web layouts.
 
+## Motivation (Why I built this?)
+
+Existing webpage text extraction methods had several limitations:
+
+- **Limitations of URL-based conversion tools**: They often fail to fetch text from sites with SPA (Single Page Application) structures or bot protection logic.
+- **Inconvenience of "Select All" copy**: Using `Ctrl+A` to copy everything includes too much unnecessary text like ads, menus, and footers, making it difficult to clean up.
+- **Tedious manual work**: Manually copying HTML from DevTools and using HTML-to-Markdown converters is a very cumbersome process.
+
+I developed this tool to solve these frustrations and to **"instantly extract only the clean text from the specific area I want."**
+
+## Limitations
+
+While Texport offers precision, it has some known limitations:
+
+- **Scattered Content**: Extracting text spread across multiple separate sections requires repeated manual actions for each part.
+- **Viewport Boundary Issues**: When an element extends beyond the current viewport, it can be difficult to visualize the exact boundaries (start/end) of the selection.
+- **Designed for Manual Precision**: As a human-driven tool, it is not suitable for large-scale automated data scraping across hundreds of pages.
+
 ## Key Features
 
 - **Visual Metadata & Feedback**: Displays the HTML tag name and character count of the hovered element. Includes a "pulse" animation when navigating between elements and a "Copied!" notification.
