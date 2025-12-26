@@ -23,6 +23,14 @@ export default defineConfig({
     }),
   ],
   build: {
+    // 1. Minification settings
+    // 'esbuild' is the default and is allowed by Chrome Web Store policies.
+    minify: 'esbuild',
+
+    // 2. Enable source maps (Recommended)
+    // Helps reviewers see the original TS code, making the review process smoother.
+    sourcemap: true,
+
     rollupOptions: {
       input: {
         popup: resolve(__dirname, 'src/popup.html'),
