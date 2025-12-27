@@ -202,14 +202,20 @@ class ActionMenuManager {
     document.body.appendChild(this.menu);
     this.positionMenu(x, y);
 
-    const closeMenu = (e: MouseEvent) => {
+    const closeHandler = (e: MouseEvent) => {
       if (this.menu && !this.menu.contains(e.target as Node)) {
-        this.remove();
-        document.removeEventListener("mousedown", closeMenu, true);
-        this.onCancel();
+        this.remove(true);
       }
     };
-    document.addEventListener("mousedown", closeMenu, true);
+    document.addEventListener("mousedown", closeHandler, true);
+    
+    // Cleanup listener when menu is removed
+    const originalRemove = this.remove.bind(this);
+    this.remove = (isCancel: boolean = false) => {
+      document.removeEventListener("mousedown", closeHandler, true);
+      originalRemove(isCancel);
+      this.remove = originalRemove; // Restore
+    };
   }
 
   private positionMenu(x: number, y: number): void {
@@ -229,10 +235,13 @@ class ActionMenuManager {
     this.menu.style.top = `${posY}px`;
   }
 
-  public remove(): void {
+  public remove(isCancel: boolean = false): void {
     if (this.menu) {
       this.menu.remove();
       this.menu = null;
+      if (isCancel) {
+        this.onCancel();
+      }
     }
   }
 
@@ -257,7 +266,7 @@ class TextExporter {
     this.actionMenuManager = new ActionMenuManager(
       () => this.handleCopy(),
       () => this.handleDownload(),
-      () => {}
+      () => this.onActionMenuCancel()
     );
 
     this.initialize();
@@ -368,7 +377,7 @@ class TextExporter {
 
     if (e.key === "Escape") {
       if (this.actionMenuManager.isActive()) {
-        this.actionMenuManager.remove();
+        this.actionMenuManager.remove(true);
       } else {
         this.toggle(false);
       }
@@ -431,7 +440,6 @@ class TextExporter {
     chrome.storage.local.get(["clickAction"], (result) => {
       const action = result.clickAction || "download";
       if (action === "ask") {
-        this.overlayManager.update(null, false);
         this.actionMenuManager.show(e.clientX, e.clientY);
       } else if (action === "copy") {
         this.handleCopy();
@@ -470,6 +478,12 @@ class TextExporter {
       this.hoveredElement = el;
       this.currentFocusElement = el;
       this.overlayManager.update(this.currentFocusElement, this.active);
+    }
+  }
+
+  private onActionMenuCancel(): void {
+    if (this.active) {
+      this.overlayManager.update(this.currentFocusElement, true);
     }
   }
 }
