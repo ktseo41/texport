@@ -110,6 +110,14 @@ Main controller class that orchestrates the extension's behavior.
 
 ## Changelog
 
+### Version 1.4.0 (Dec 27, 2025)
+
+- **feat**: Added **Global Shield** for robust mouse tracking, ensuring consistent behavior even over `iframe` elements.
+- **feat**: Implemented **Iframe Detection** with restricted UI feedback (red overlay and "Security Protected" label) for browser security awareness.
+- **feat**: Redesigned **Action Menu** and **Mini-map** with **Apple-style Liquid Glass UI** (high blur, saturation, and glassmorphism).
+- **feat**: Added a **Package script** (`pnpm package`) for automated build and zip with version-based naming.
+- **chore**: Optimized **Vite config** (minification, sourcemaps) and updated **Privacy Policy** for Chrome Web Store compliance.
+
 ### Version 1.3.0 (Dec 26, 2025)
 
 - **refactor**: Migrated codebase from JavaScript to **TypeScript** for improved type safety.
