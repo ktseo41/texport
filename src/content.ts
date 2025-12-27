@@ -7,6 +7,7 @@ class OverlayManager {
   private miniMap: HTMLDivElement | null = null;
   private miniMapElement: HTMLDivElement | null = null;
   private miniMapViewport: HTMLDivElement | null = null;
+  private shield: HTMLDivElement | null = null;
   private isCopiedState: boolean = false;
 
   constructor() {}
@@ -32,8 +33,16 @@ class OverlayManager {
     this.miniMap.appendChild(this.miniMapElement);
     this.miniMap.appendChild(this.miniMapViewport);
 
+    this.shield = document.createElement("div");
+    this.shield.className = "texport-shield";
+
     document.body.appendChild(this.overlay);
     document.body.appendChild(this.miniMap);
+    document.body.appendChild(this.shield);
+  }
+
+  public getShield(): HTMLDivElement | null {
+    return this.shield;
   }
 
   public remove(): void {
@@ -47,6 +56,10 @@ class OverlayManager {
       this.miniMap = null;
       this.miniMapElement = null;
       this.miniMapViewport = null;
+    }
+    if (this.shield) {
+      this.shield.remove();
+      this.shield = null;
     }
   }
 
@@ -65,11 +78,21 @@ class OverlayManager {
     this.overlay.style.width = `${rect.width}px`;
     this.overlay.style.height = `${rect.height}px`;
 
+    const tagName = el.tagName.toLowerCase();
+    const isIframe = tagName === "iframe";
+
     if (this.isCopiedState) return;
 
-    const text = (el.innerText || "").trim();
-    const tagName = el.tagName.toLowerCase();
-    this.label.innerHTML = `<span class="texport-tag">${tagName}</span><span>${text.length}</span>`;
+    if (isIframe) {
+      this.label.innerHTML = `<span class="texport-tag">${tagName}</span><span>Security Protected</span>`;
+      this.label.classList.add("restricted");
+      this.overlay.classList.add("restricted");
+    } else {
+      const text = (el.innerText || "").trim();
+      this.label.innerHTML = `<span class="texport-tag">${tagName}</span><span>${text.length}</span>`;
+      this.label.classList.remove("restricted");
+      this.overlay.classList.remove("restricted");
+    }
 
     this.updateLabelPosition(rect);
     this.updateMiniMap(el, rect);
@@ -157,6 +180,20 @@ class OverlayManager {
         this.update(el, true);
       }
     }, 1000);
+  }
+
+  public showRestrictedFeedback(): void {
+    if (!this.label) return;
+    this.isCopiedState = true;
+    const oldHtml = this.label.innerHTML;
+    this.label.innerHTML = "<span>Access Denied (iframe)</span>";
+    
+    setTimeout(() => {
+      this.isCopiedState = false;
+      if (this.label) {
+        this.label.innerHTML = oldHtml;
+      }
+    }, 1500);
   }
 }
 
@@ -322,18 +359,32 @@ class TextExporter {
   }
 
   private addEventListeners(): void {
-    document.addEventListener("mousemove", this.handleMouseMove, true);
+    const shield = this.overlayManager.getShield();
+    if (shield) {
+      shield.addEventListener("mousemove", this.handleMouseMove, true);
+      shield.addEventListener("mousedown", this.handleMouseDown, true);
+      shield.addEventListener("click", this.handleClick, true);
+    }
     document.addEventListener("keydown", this.handleKeyDown, true);
-    document.addEventListener("click", this.handleClick, true);
     window.addEventListener("scroll", this.handleScroll, { passive: true });
   }
 
   private removeEventListeners(): void {
-    document.removeEventListener("mousemove", this.handleMouseMove, true);
+    const shield = this.overlayManager.getShield();
+    if (shield) {
+      shield.removeEventListener("mousemove", this.handleMouseMove, true);
+      shield.removeEventListener("mousedown", this.handleMouseDown, true);
+      shield.removeEventListener("click", this.handleClick, true);
+    }
     document.removeEventListener("keydown", this.handleKeyDown, true);
-    document.removeEventListener("click", this.handleClick, true);
     window.removeEventListener("scroll", this.handleScroll);
   }
+
+  private handleMouseDown = (e: MouseEvent): void => {
+    if (!this.active || this.actionMenuManager.isActive()) return;
+    // Fast-path for clicks without waiting for mousemove
+    this.updateFromPoint(e.clientX, e.clientY);
+  };
 
   private handleMouseMove = (e: MouseEvent): void => {
     this.lastMouseX = e.clientX;
@@ -343,24 +394,36 @@ class TextExporter {
 
     if (this.rafId) cancelAnimationFrame(this.rafId);
     this.rafId = requestAnimationFrame(() => {
-      const el = document.elementFromPoint(this.lastMouseX, this.lastMouseY) as HTMLElement | null;
-      if (el && this.isSelectable(el)) {
-        if (this.hoveredElement !== el) {
-          this.hoveredElement = el;
-          this.currentFocusElement = el;
-          this.overlayManager.update(this.currentFocusElement, this.active);
-        }
-      }
+      this.updateFromPoint(this.lastMouseX, this.lastMouseY);
       this.rafId = null;
     });
   };
+
+  private updateFromPoint(x: number, y: number): void {
+    const shield = this.overlayManager.getShield();
+    if (!shield) return;
+
+    // The trick: temporarily hide the shield to see what's underneath
+    shield.style.pointerEvents = "none";
+    const el = document.elementFromPoint(x, y) as HTMLElement | null;
+    shield.style.pointerEvents = "auto";
+
+    if (el && this.isSelectable(el)) {
+      if (this.hoveredElement !== el) {
+        this.hoveredElement = el;
+        this.currentFocusElement = el;
+        this.overlayManager.update(this.currentFocusElement, this.active);
+      }
+    }
+  }
 
   private isSelectable(el: HTMLElement): boolean {
     // Basic check to avoid selecting the overlay or the menu itself
     return !el.classList.contains("texport-overlay") && 
            !el.closest(".texport-overlay") &&
            !el.classList.contains("texport-menu") &&
-           !el.closest(".texport-menu");
+           !el.closest(".texport-menu") &&
+           !el.classList.contains("texport-shield");
   }
 
   private handleScroll = (): void => {
@@ -437,6 +500,11 @@ class TextExporter {
     e.preventDefault();
     e.stopPropagation();
 
+    if (this.currentFocusElement.tagName.toLowerCase() === "iframe") {
+      this.overlayManager.showRestrictedFeedback();
+      return;
+    }
+
     chrome.storage.local.get(["clickAction"], (result) => {
       const action = result.clickAction || "download";
       if (action === "ask") {
@@ -473,12 +541,7 @@ class TextExporter {
   }
 
   private updateFromCurrentPosition(): void {
-    const el = document.elementFromPoint(this.lastMouseX, this.lastMouseY) as HTMLElement | null;
-    if (el && this.isSelectable(el)) {
-      this.hoveredElement = el;
-      this.currentFocusElement = el;
-      this.overlayManager.update(this.currentFocusElement, this.active);
-    }
+    this.updateFromPoint(this.lastMouseX, this.lastMouseY);
   }
 
   private onActionMenuCancel(): void {

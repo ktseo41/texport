@@ -9,6 +9,17 @@
   will-change: top, left, width, height;
 }
 
+.texport-shield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999998; /* Just below the overlay */
+  background: transparent;
+  cursor: crosshair;
+}
+
 .texport-overlay.pulse {
   animation: texport-pulse 0.3s ease-out;
 }
@@ -51,6 +62,20 @@
 
 .texport-label.copied {
   background: #28a745 !important;
+}
+
+.texport-overlay.restricted {
+  background-color: rgba(220, 53, 69, 0.1);
+  border: 2px solid rgba(220, 53, 69, 0.4);
+  box-shadow: 0 0 15px rgba(220, 53, 69, 0.15);
+}
+
+.texport-label.restricted {
+  background: linear-gradient(
+    135deg,
+    rgba(220, 53, 69, 0.95),
+    rgba(167, 29, 42, 0.95)
+  );
 }
 
 .texport-tag {
