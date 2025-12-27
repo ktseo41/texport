@@ -29,6 +29,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     reader.readAsDataURL(blob);
     return true; // Keep the message channel open for async response
   }
+
+  if (request.action === "broadcastHover") {
+    // Notify all frames in the sender's tab EXCEPT the sender frame
+    if (sender.tab && sender.tab.id) {
+      chrome.tabs.sendMessage(sender.tab.id, { 
+        action: "otherFrameHovered",
+        sourceFrameId: request.sourceFrameId
+      });
+    }
+  }
 });
 
 // Handle keyboard shortcuts

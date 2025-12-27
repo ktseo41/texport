@@ -34,7 +34,8 @@
       ],
       "css": [
         "content.css"
-      ]
+      ],
+      "all_frames": true
     }
   ],
   "commands": {

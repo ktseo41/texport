@@ -33,7 +33,11 @@ class OverlayManager {
     this.miniMap.appendChild(this.miniMapViewport);
 
     document.body.appendChild(this.overlay);
-    document.body.appendChild(this.miniMap);
+    
+    // Only add mini-map to the top frame
+    if (window.self === window.top) {
+      document.body.appendChild(this.miniMap);
+    }
   }
 
   public remove(): void {
@@ -76,7 +80,7 @@ class OverlayManager {
   }
 
   private updateMiniMap(el: HTMLElement, rect: DOMRect): void {
-    if (!this.miniMap || !this.miniMapElement || !this.miniMapViewport) return;
+    if (window.self !== window.top || !this.miniMap || !this.miniMapElement || !this.miniMapViewport) return;
 
     const docHeight = Math.max(
       document.body.scrollHeight,
@@ -299,7 +303,23 @@ class TextExporter {
       this.lastMouseX = e.clientX;
       this.lastMouseY = e.clientY;
     }, true);
+
+    // Coordinate between frames
+    const frameId = Math.random().toString(36).substr(2, 9);
+    chrome.runtime.onMessage.addListener((request) => {
+      if (request.action === "otherFrameHovered" && request.sourceFrameId !== frameId) {
+        // If another frame just hovered something, hide my overlay
+        this.currentFocusElement = null;
+        this.hoveredElement = null;
+        this.overlayManager.update(null, this.active);
+      }
+    });
+
+    // Replace broadcast loop with specific frameId
+    this.currentFrameId = frameId;
   }
+
+  private currentFrameId: string = "";
 
   private toggle(state: boolean): void {
     if (this.active === state) return;
@@ -349,6 +369,12 @@ class TextExporter {
           this.hoveredElement = el;
           this.currentFocusElement = el;
           this.overlayManager.update(this.currentFocusElement, this.active);
+          
+          // Notify other frames in the same tab that I have the focus
+          chrome.runtime.sendMessage({ 
+            action: "broadcastHover",
+            sourceFrameId: this.currentFrameId 
+          });
         }
       }
       this.rafId = null;
@@ -356,18 +382,34 @@ class TextExporter {
   };
 
   private isSelectable(el: HTMLElement): boolean {
-    // Basic check to avoid selecting the overlay or the menu itself
     return !el.classList.contains("texport-overlay") && 
            !el.closest(".texport-overlay") &&
            !el.classList.contains("texport-menu") &&
-           !el.closest(".texport-menu");
+           !el.closest(".texport-menu") &&
+           el.tagName.toLowerCase() !== "iframe";
   }
 
   private handleScroll = (): void => {
-    if (!this.active || !this.currentFocusElement) return;
+    if (!this.active) return;
+    
     if (this.rafId) cancelAnimationFrame(this.rafId);
     this.rafId = requestAnimationFrame(() => {
-      this.overlayManager.update(this.currentFocusElement, this.active);
+      // Update element under cursor if not already in deep navigation
+      if (!this.actionMenuManager.isActive()) {
+        const el = document.elementFromPoint(this.lastMouseX, this.lastMouseY) as HTMLElement | null;
+        if (el && this.isSelectable(el)) {
+          this.hoveredElement = el;
+          // Only auto-update focus if it wasn't manually moved far away via keyboard?
+          // For now, let's keep it simple and update if it's still related
+          if (!this.currentFocusElement || !this.currentFocusElement.contains(el)) {
+            this.currentFocusElement = el;
+          }
+        }
+      }
+      
+      if (this.currentFocusElement) {
+        this.overlayManager.update(this.currentFocusElement, this.active);
+      }
       this.rafId = null;
     });
   };
@@ -415,16 +457,28 @@ class TextExporter {
   }
 
   private navigateDown(e: KeyboardEvent): void {
-    if (!this.hoveredElement || !this.currentFocusElement) return;
+    if (!this.currentFocusElement) return;
+
+    let targetChild: HTMLElement | null = null;
     
-    if (this.currentFocusElement.contains(this.hoveredElement) && this.currentFocusElement !== this.hoveredElement) {
+    // 1. Try to navigate towards the currently hovered element
+    if (this.hoveredElement && 
+        this.currentFocusElement.contains(this.hoveredElement) && 
+        this.currentFocusElement !== this.hoveredElement) {
+      targetChild = this.hoveredElement;
+      while (targetChild.parentElement !== this.currentFocusElement) {
+        targetChild = targetChild.parentElement as HTMLElement;
+      }
+    } 
+    // 2. Fallback: navigate to the first element child
+    else if (this.currentFocusElement.firstElementChild) {
+      targetChild = this.currentFocusElement.firstElementChild as HTMLElement;
+    }
+
+    if (targetChild) {
       e.preventDefault();
       e.stopPropagation();
-      let child: HTMLElement = this.hoveredElement;
-      while (child.parentElement !== this.currentFocusElement) {
-        child = child.parentElement as HTMLElement;
-      }
-      this.currentFocusElement = child;
+      this.currentFocusElement = targetChild;
       this.overlayManager.update(this.currentFocusElement, this.active);
       this.overlayManager.triggerPulse();
     }
