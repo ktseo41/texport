@@ -1,4 +1,6 @@
 // content.ts
+import { createIcons, Clipboard, Download } from 'lucide';
+
 
 
 class OverlayManager {
@@ -214,7 +216,12 @@ class ActionMenuManager {
 
     const copyBtn = document.createElement("button");
     copyBtn.className = "copy-btn";
-    copyBtn.textContent = "Copy to Clipboard";
+    copyBtn.innerHTML = `
+      <div class="icon-container">
+        <i data-lucide="clipboard"></i>
+      </div>
+      <span>Copy to Clipboard</span>
+    `;
     copyBtn.onclick = () => {
       this.onCopy();
       this.remove();
@@ -222,7 +229,12 @@ class ActionMenuManager {
 
     const downloadBtn = document.createElement("button");
     downloadBtn.className = "download-btn";
-    downloadBtn.textContent = "Save as .txt";
+    downloadBtn.innerHTML = `
+      <div class="icon-container">
+        <i data-lucide="download"></i>
+      </div>
+      <span>Save as .txt</span>
+    `;
     downloadBtn.onclick = () => {
       this.onDownload();
       this.remove();
@@ -239,7 +251,16 @@ class ActionMenuManager {
     document.body.appendChild(this.menu);
     this.positionMenu(x, y);
 
+    // Initialize lucide icons
+    createIcons({
+      icons: {
+        Clipboard,
+        Download
+      }
+    });
+
     const closeHandler = (e: MouseEvent) => {
+
       if (this.menu && !this.menu.contains(e.target as Node)) {
         this.remove(true);
       }

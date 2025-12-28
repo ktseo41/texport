@@ -124,9 +124,33 @@
 }
 
 .texport-menu button:hover {
-  background-color: rgba(0, 123, 255, 0.15);
+  background-color: rgba(0, 123, 255, 0.1);
   color: #007bff;
-  transform: scale(1.02);
+}
+
+.texport-menu .icon-container {
+  width: 32px;
+  height: 32px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.texport-menu button:hover .icon-container {
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.texport-menu .icon-container i,
+.texport-menu .icon-container svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.2;
 }
 
 .texport-menu .menu-hint {
