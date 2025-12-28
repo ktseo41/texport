@@ -27,6 +27,7 @@ While Texport offers precision, it has some known limitations:
 - **Hierarchy Navigation**: Use `ArrowUp` to select the parent element and `ArrowDown` to drill back down to child elements.
 - **Flexible Export Actions**:
   - **Download**: Save the selected text directly as a `.txt` file (filename auto-generated from document title).
+  - **Fast Download**: Option to skip the "Save As" browser dialog for instant file saving.
   - **Copy**: Copy the selected text to the clipboard.
   - **Ask**: Displays a context menu on click, allowing the user to choose between Download and Copy.
 - **Keyboard Shortcuts**:
@@ -109,6 +110,11 @@ Main controller class that orchestrates the extension's behavior.
 ---
 
 ## Changelog
+
+### Version 1.5.0 (Dec 28, 2025)
+
+- **feat**: Added **Fast Download** option to bypass the "Save As" dialog for one-click saving.
+- **feat**: Updated **Popup UI** with a modern toggle switch for the Fast Download setting.
 
 ### Version 1.4.0 (Dec 27, 2025)
 

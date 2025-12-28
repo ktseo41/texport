@@ -4,9 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const downloadBtn = document.getElementById("downloadAction") as HTMLButtonElement | null;
   const copyBtn = document.getElementById("copyAction") as HTMLButtonElement | null;
   const askBtn = document.getElementById("askAction") as HTMLButtonElement | null;
+  const fastDownloadToggle = document.getElementById("fastDownloadToggle") as HTMLInputElement | null;
   const toggleKbdContainer = document.getElementById("toggleKbdContainer") as HTMLDivElement | null;
 
-  if (!toggleBtn || !downloadBtn || !copyBtn || !askBtn) {
+  if (!toggleBtn || !downloadBtn || !copyBtn || !askBtn || !fastDownloadToggle) {
     console.error("Required elements not found");
     return;
   }
@@ -26,10 +27,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Get current status from storage
-  chrome.storage.local.get(["enabled", "clickAction"], (result) => {
+  chrome.storage.local.get(["enabled", "clickAction", "fastDownload"], (result) => {
     updateUI(!!result.enabled);
     updateBadge(!!result.enabled);
     updateActionUI((result.clickAction as string) || "download");
+    if (fastDownloadToggle) {
+      fastDownloadToggle.checked = !!result.fastDownload;
+    }
   });
 
   // Fetch actual commands from Chrome
@@ -109,6 +113,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Fast download toggle listener
+  fastDownloadToggle.addEventListener("change", () => {
+    chrome.storage.local.set({ fastDownload: fastDownloadToggle.checked });
+  });
+
   // Shortcut management listeners
   const openShortcuts = () => {
     chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
@@ -142,6 +151,19 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.classList.remove("active");
       }
     });
+
+    const isDownloadRelated = action === "download" || action === "ask";
+    if (fastDownloadToggle) {
+      fastDownloadToggle.disabled = !isDownloadRelated;
+      const container = fastDownloadToggle.closest(".setting-item");
+      if (container) {
+        if (isDownloadRelated) {
+          container.classList.remove("disabled");
+        } else {
+          container.classList.add("disabled");
+        }
+      }
+    }
   }
 
   // Listen for storage changes to sync UI
@@ -153,6 +175,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (changes.clickAction) {
         updateActionUI(changes.clickAction.newValue as string);
+      }
+      if (changes.fastDownload && fastDownloadToggle) {
+        fastDownloadToggle.checked = !!changes.fastDownload.newValue;
       }
     }
   });

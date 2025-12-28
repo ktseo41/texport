@@ -6,24 +6,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     reader.onload = function () {
       const url = reader.result as string;
-      chrome.downloads.download(
-        {
-          url: url,
-          filename: request.filename || "extracted_text.txt",
-          saveAs: true,
-        },
-        (downloadId) => {
-          if (chrome.runtime.lastError) {
-            console.error("Download failed:", chrome.runtime.lastError);
-            sendResponse({
-              success: false,
-              error: chrome.runtime.lastError.message,
-            });
-          } else {
-            sendResponse({ success: true, downloadId: downloadId });
+      chrome.storage.local.get(["fastDownload"], (result) => {
+        const skipDialog = !!result.fastDownload;
+        chrome.downloads.download(
+          {
+            url: url,
+            filename: request.filename || "extracted_text.txt",
+            saveAs: !skipDialog,
+          },
+          (downloadId) => {
+            if (chrome.runtime.lastError) {
+              console.error("Download failed:", chrome.runtime.lastError);
+              sendResponse({
+                success: false,
+                error: chrome.runtime.lastError.message,
+              });
+            } else {
+              sendResponse({ success: true, downloadId: downloadId });
+            }
           }
-        }
-      );
+        );
+      });
     };
 
     reader.readAsDataURL(blob);
