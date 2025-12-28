@@ -87,6 +87,70 @@ Built with ❤️ for productivity
 
 ---
 
+## Additional Fields
+
+### Official URL
+
+**Not required** - Leave blank or use: `https://github.com/ktseo41/texport`
+
+### Homepage URL
+
+`https://github.com/ktseo41/texport`
+
+### Support URL
+
+`https://github.com/ktseo41/texport/issues`
+
+> 💡 **빠른 출시 팁**: 초기 출시시엔 별도 랜딩페이지 없이 GitHub으로 통일. GitHub Issues를 Support로 사용하면 사용자 피드백 수집과 활성화된 프로젝트 이미지를 동시에 얻을 수 있습니다.
+
+---
+
+## Single Purpose Description
+
+**Required for Chrome Web Store Privacy Section** (1000자 이내)
+
+```
+This extension allows users to visually select and extract text content from any webpage.
+
+Users can hover over page elements to see them highlighted, navigate the DOM hierarchy using arrow keys, and export the selected text by copying to clipboard or downloading as a .txt file.
+
+The single purpose is: Precise visual text extraction from web pages.
+```
+
+---
+
+## Data Usage Declaration
+
+**Chrome Web Store Privacy Section**
+
+### User Data Collection
+
+**All categories: NO** (모든 항목 체크 해제)
+
+| Category                              | Collected? | Reason                                   |
+| ------------------------------------- | ---------- | ---------------------------------------- |
+| ☐ Personally identifiable information | **No**     | 이름, 이메일 등 수집하지 않음            |
+| ☐ Health information                  | **No**     | 해당 없음                                |
+| ☐ Financial and payment information   | **No**     | 해당 없음                                |
+| ☐ Authentication information          | **No**     | 로그인 기능 없음                         |
+| ☐ Personal communications             | **No**     | 메시지 접근하지 않음                     |
+| ☐ Location                            | **No**     | IP, GPS 수집하지 않음                    |
+| ☐ Web history                         | **No**     | 방문 기록 저장하지 않음                  |
+| ☐ User activity                       | **No**     | 클릭/스크롤 로깅하지 않음                |
+| ☐ Website content                     | **No**     | 컨텐츠는 로컬에서만 처리, 외부 전송 없음 |
+
+### Required Certifications
+
+**All three must be checked** (필수 3가지 인증)
+
+- ✅ I do not sell or transfer user data to third parties, outside of the approved use cases
+- ✅ I do not use or transfer user data for purposes that are unrelated to my item's single purpose
+- ✅ I do not use or transfer user data to determine creditworthiness or for lending purposes
+
+> ✨ **근거**: PRD의 "PRIVACY FIRST" 섹션에 명시된 대로 "All processing happens locally in your browser". 모든 데이터는 사용자의 브라우저 로컬에서만 처리되며, 외부 서버로 전송되지 않습니다.
+
+---
+
 ## Screenshots Required
 
 스토어 등록을 위해 다음 스크린샷을 준비하세요 (1280x800 또는 640x400 권장):
